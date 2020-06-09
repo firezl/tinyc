@@ -67,7 +67,11 @@ static struct
 } reservedWords[MAXRESERVED]
 = { {"if",IF},{"then",THEN},{"else",ELSE},{"end",END},
    {"repeat",REPEAT},{"until",UNTIL},{"read",READ},
-   {"write",WRITE} };
+   {"write",WRITE},
+	
+	/*ADD new reservedWords*/
+	
+    {"while",WHILE},{"int",INT},{ "do",DO },{"char",CHAR}, };
 
 /* lookup an identifier to see if it is a reserved word */
 /* uses linear search */
@@ -163,6 +167,7 @@ TokenType getToken(void)
             {
                 state = DONE;
                 currentToken = ENDFILE;
+                //printf("»±…Ÿ”“ª®¿®∫≈\n");
             }
             else if (c == '}') state = START;
             break;
