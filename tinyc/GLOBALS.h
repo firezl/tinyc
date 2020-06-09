@@ -24,7 +24,7 @@
 #endif
 
 /* MAXRESERVED = the number of reserved words */
-#define MAXRESERVED 8
+#define MAXRESERVED 12
 
 typedef enum
 /* book-keeping tokens */
@@ -32,6 +32,12 @@ typedef enum
     ENDFILE, ERROR,
     /* reserved words */
     IF, THEN, ELSE, END, REPEAT, UNTIL, READ, WRITE,
+	/*
+	 * ADD declaration of  integer and char
+	 * reserved words of while
+	 */
+	INT, CHAR, WHILE, DO,
+	
     /* multicharacter tokens */
     ID, NUM,
     /* special symbols */
@@ -48,12 +54,13 @@ extern int lineno; /* source line number for listing */
 /***********   Syntax tree for parsing ************/
 /**************************************************/
 
-typedef enum { StmtK, ExpK } NodeKind;
-typedef enum { IfK, RepeatK, AssignK, ReadK, WriteK ,WhileK} StmtKind;
+typedef enum { StmtK, ExpK,DefineK } NodeKind;
+typedef enum { IfK, RepeatK, AssignK, ReadK, WriteK, WhileK } StmtKind;
 typedef enum { OpK, ConstK, IdK } ExpKind;
+typedef enum { IntD, CharD} DefineKind;
 
 /* ExpType is used for type checking */
-typedef enum { Void, Integer, Boolean } ExpType;
+typedef enum { Void, Integer, Boolean, Char } ExpType;
 
 #define MAXCHILDREN 3
 
@@ -63,7 +70,7 @@ typedef struct treeNode
     struct treeNode* sibling;
     int lineno;
     NodeKind nodekind;
-    union { StmtKind stmt; ExpKind exp; } kind;
+    union { StmtKind stmt; ExpKind exp; DefineKind define; } kind;
     union {
         TokenType op;
         int val;
