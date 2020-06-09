@@ -90,6 +90,21 @@ static void genStmt(TreeNode* tree)
         /* now output it */
         emitRO("OUT", ac, 0, 0, "write ac");
         break;
+    case WhileK:
+        if (TraceCode) emitComment("-> while");
+        p1 = tree->child[0];
+        p2 = tree->child[1];
+        emitComment("while: if test is false jump to end");
+        int currentLoc1 = emitSkip(0);
+        cGen(p1);   // genrate code for the test
+        savedLoc1 = emitSkip(1);    // generate the jump 
+        cGen(p2);
+        emitRM_Abs("LDA", pc, currentLoc1, "jumop to the start");
+        int currentLoc2 = emitSkip(0);
+        emitBackup(savedLoc1);
+        emitRM_Abs("JNE", ac, currentLoc2, "jump to the end");
+        if (TraceCode)  emitComment("<- while");
+        break;
     default:
         break;
     }

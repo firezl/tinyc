@@ -143,6 +143,7 @@
     <ClInclude Include="CODE.h" />
     <ClInclude Include="GLOBALS.h" />
     <ClInclude Include="PARSE.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SCAN.h" />
     <ClInclude Include="SYMTAB.h" />
     <ClInclude Include="UTIL.h" />
@@ -156,6 +157,9 @@
     <ClCompile Include="SCAN.cpp" />
     <ClCompile Include="SYMTAB.cpp" />
     <ClCompile Include="UTIL.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SAMPLE.TNY" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

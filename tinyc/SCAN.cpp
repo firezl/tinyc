@@ -97,7 +97,7 @@ TokenType getToken(void)
     int save;
     while (state != DONE)
     {
-        int c = getNextChar();
+        char c = getNextChar();
         save = TRUE;
         switch (state)
         {
