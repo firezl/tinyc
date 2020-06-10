@@ -94,21 +94,6 @@ TreeNode* newExpNode(ExpKind kind)
     return t;
 }
 
-TreeNode* newDefineNode(DefineKind kind)
-{
-    TreeNode* t = (TreeNode*)malloc(sizeof(TreeNode));
-    int i;
-    if (t == NULL)
-        fprintf(listing, "Out of memory error at line %d\n", lineno);
-    else {
-        for (i = 0; i < MAXCHILDREN; i++) t->child[i] = NULL;
-        t->sibling = NULL;
-        t->nodekind = DefineK;
-        t->kind.define = kind;
-        t->lineno = lineno;
-    }
-    return t;
-}
 
 /* Function copyString allocates and makes a new
  * copy of an existing string
@@ -170,6 +155,10 @@ void printTree(TreeNode* tree)
             case WriteK:
                 fprintf(listing, "Write\n");
                 break;
+            case IntK:
+                fprintf(listing, "Int: %s\n", tree->attr.name);
+            case CharK:
+                fprintf(listing, "Char: %s\n", tree->attr.name);
             default:
                 fprintf(listing, "Unknown ExpNode kind\n");
                 break;

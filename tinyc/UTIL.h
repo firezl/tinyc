@@ -29,8 +29,6 @@ TreeNode* newExpNode(ExpKind);
  */
 char* copyString(char*);
 
-TreeNode* newDefineNode(DefineKind);
-
 /* procedure printTree prints a syntax tree to the
  * listing file using indentation to indicate subtrees
  */

@@ -59,6 +59,39 @@ typedef struct BucketListRec
 /* the hash table */
 static BucketList hashTable[SIZE];
 
+/* The record in the Typelist for each value
+ * include name and type     
+ */
+typedef struct TypeListRec
+{
+    char* name;
+    ExpType type;
+    struct TypeListRec* next;
+} *TypeList;
+
+/* the hash table */
+static TypeList thashTable[SIZE];
+
+void tt_insert(char* name, ExpType type)
+{
+    int h = hash(name);
+    TypeList l = thashTable[h];
+    while ((l != NULL) && (strcmp(name, l->name) != 0))
+        l = l->next;
+    if (l == NULL) /* variable not yet in table */
+    {
+        l = (TypeList)malloc(sizeof(struct TypeListRec));
+        l->name = name;
+        l->type = type;
+        l->next = thashTable[h];
+        thashTable[h] = l;
+    }
+    else /* found in table, so just add line number */
+    {
+        l->type = type;
+    }
+}
+
 /* Procedure st_insert inserts line numbers and
  * memory locations into the symbol table
  * loc = memory location is inserted only the
@@ -90,6 +123,16 @@ void st_insert(char* name, int lineno, int loc)
         t->next->next = NULL;
     }
 } /* st_insert */
+
+ExpType tt_lookup(char* name)
+{
+    int h = hash(name);
+    TypeList l = thashTable[h];
+    while ((l != NULL) && (strcmp(name, l->name) != 0))
+        l = l->next;
+    if (l == NULL) return Integer;
+    else return l->type;
+}
 
 /* Function st_lookup returns the memory
  * location of a variable or -1 if not found

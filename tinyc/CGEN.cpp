@@ -25,7 +25,7 @@ static void cGen(TreeNode* tree);
 static void genStmt(TreeNode* tree)
 {
     TreeNode* p1, * p2, * p3;
-    int savedLoc1, savedLoc2, currentLoc;
+    int savedLoc1, savedLoc2, currentLoc, currentLoc1, currentLoc2;
     int loc;
     switch (tree->kind.stmt) {
 
@@ -78,7 +78,24 @@ static void genStmt(TreeNode* tree)
         emitRM("ST", ac, loc, gp, "assign: store value");
         if (TraceCode)  emitComment("<- assign");
         break; /* assign_k */
-
+    case IntK:
+        if (TraceCode) emitComment("-> assign");
+        /* generate code for rhs */
+        cGen(tree->child[0]);
+        /* now store value */
+        loc = st_lookup(tree->attr.name);
+        emitRM("ST", ac, loc, gp, "assign: store value");
+        if (TraceCode)  emitComment("<- assign");
+        break; /* assign_k */
+    case CharK:
+        if (TraceCode) emitComment("-> assign");
+        /* generate code for rhs */
+        cGen(tree->child[0]);
+        /* now store value */
+        loc = st_lookup(tree->attr.name);
+        emitRM("ST", ac, loc, gp, "assign: store value");
+        if (TraceCode)  emitComment("<- assign");
+        break; /* assign_k */
     case ReadK:
         emitRO("IN", ac, 0, 0, "read integer value");
         loc = st_lookup(tree->attr.name);
@@ -90,19 +107,24 @@ static void genStmt(TreeNode* tree)
         /* now output it */
         emitRO("OUT", ac, 0, 0, "write ac");
         break;
+    case WritecK:
+        cGen(tree->child[0]);
+        emitRO("OUC", ac, 0, 0, "write char ac");
+        break;
     case WhileK:
         if (TraceCode) emitComment("-> while");
         p1 = tree->child[0];
         p2 = tree->child[1];
         emitComment("while: if test is false jump to end");
-        int currentLoc1 = emitSkip(0);
+        currentLoc1 = emitSkip(0);
         cGen(p1);   // genrate code for the test
         savedLoc1 = emitSkip(1);    // generate the jump 
         cGen(p2);
         emitRM_Abs("LDA", pc, currentLoc1, "jumop to the start");
-        int currentLoc2 = emitSkip(0);
+        currentLoc2 = emitSkip(0);
         emitBackup(savedLoc1);
-        emitRM_Abs("JNE", ac, currentLoc2, "jump to the end");
+        emitRM_Abs("JEQ", ac, currentLoc2, "jump to the end");
+        emitRestore();
         if (TraceCode)  emitComment("<- while");
         break;
     default:

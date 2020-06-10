@@ -67,7 +67,7 @@ static struct
 } reservedWords[MAXRESERVED]
 = { {"if",IF},{"then",THEN},{"else",ELSE},{"end",END},
    {"repeat",REPEAT},{"until",UNTIL},{"read",READ},
-   {"write",WRITE},
+   {"write",WRITE},{"writec",WRITEC},
 	
 	/*ADD new reservedWords*/
 	
@@ -127,6 +127,9 @@ TokenType getToken(void)
                 case EOF:
                     save = FALSE;
                     currentToken = ENDFILE;
+                    break;
+                case '\'':
+                    currentToken = QUOT;
                     break;
                 case '=':
                     currentToken = EQ;

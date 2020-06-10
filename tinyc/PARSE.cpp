@@ -9,6 +9,7 @@
 #include "util.h"
 #include "scan.h"
 #include "parse.h"
+#include "SYMTAB.h"
 
 static TokenType token; /* holds current token */
 
@@ -17,20 +18,17 @@ static TreeNode* stmt_sequence(void);
 static TreeNode* statement(void);
 static TreeNode* if_stmt(void);
 static TreeNode* repeat_stmt(void);
+static TreeNode* while_stmt(void);
 static TreeNode* assign_stmt(void);
 static TreeNode* read_stmt(void);
 static TreeNode* write_stmt(void);
+static TreeNode* writec_stmt(void);
+static TreeNode* int_stmt(void);
+static TreeNode* char_stmt(void);
 static TreeNode* exp(void);
 static TreeNode* simple_exp(void);
 static TreeNode* term(void);
 static TreeNode* factor(void);
-
-/*ADD the new TreeNode type*/
-static TreeNode* while_stmt(void);
-static TreeNode* decl(void);
-static TreeNode* type_specifier(void);
-static TreeNode* declarations(void);
-static TreeNode* program(void);
 
 static void syntaxError(const char* message)
 {
@@ -39,21 +37,6 @@ static void syntaxError(const char* message)
     Error = TRUE;
 }
 
-TreeNode* program(void)
-{
-    TreeNode* t = declarations();
-    TreeNode* tempT = t;
-    while (tempT->sibling != NULL)
-    {
-        tempT = tempT->sibling;
-    }
-    if (tempT != NULL) 
-    {
-        tempT->sibling = stmt_sequence();
-    }
-    tempT = NULL;
-    return t;
-}
 
 static void match(TokenType expected)
 {
@@ -63,69 +46,6 @@ static void match(TokenType expected)
         printToken(token, tokenString);
         fprintf(listing, "      ");
     }
-}
-
-
-TreeNode* declarations(void)
-{
-    TreeNode* t = decl();
-    match(SEMI);
-    TreeNode* p = t;
-    while ((token != ENDFILE) && (token != END))
-    {
-        TreeNode* q = NULL;
-        q = decl();
-        if (q != NULL) {
-            if (t == NULL) t = p = q;
-            else /* now p cannot be NULL either */
-            {
-                p->sibling = q;
-                p = q;
-            }
-            match(SEMI);
-        }
-        else {
-            break;
-        }
-    }
-    return t;
-}
-
-TreeNode* decl(void)
-{
-
-    TreeNode* t = type_specifier();
-    if (t != NULL) {
-        //ExpType t_type_tmp = t->type;
-        t->child[0] = newExpNode(IdK);
-        t->child[0]->attr.name = copyString(tokenString);
-        t->child[0]->type = t->type;
-        match(ID);
-    }
-    return t;
-}
-
-TreeNode* type_specifier(void)
-{
-    TreeNode* t = NULL;
-    switch (token)
-    {
-    case INT:
-        t = newDefineNode(IntD);
-        t->attr.name = "int";
-        t->type = Integer;
-        match(INT);
-        break;
-    case CHAR:
-        t = newDefineNode(CharD);
-        t->attr.name = "char";
-        t->type = Char;
-        match(CHAR);
-        break;
-    default:
-        break;
-    }
-    return t;
 }
 
 TreeNode* stmt_sequence(void)
@@ -159,13 +79,55 @@ TreeNode* statement(void)
     case ID: t = assign_stmt(); break;
     case READ: t = read_stmt(); break;
     case WRITE: t = write_stmt(); break;
+    case WRITEC: t = writec_stmt(); break;
     /*add while-stmt*/
     case WHILE: t = while_stmt();break;
+    case INT: t = int_stmt(); break;
+    case CHAR: t = char_stmt(); break;
     default: syntaxError("unexpected token -> ");
         printToken(token, tokenString);
         token = getToken();
         break;
     } /* end case */
+    return t;
+}
+
+TreeNode* int_stmt()
+{
+    TreeNode* t = newStmtNode(IntK);
+    match(INT);
+    if (t != NULL && token == ID)
+    {
+        t->attr.name = copyString(tokenString);
+    }
+    match(ID);
+    match(ASSIGN);
+    if (t != NULL)
+    {
+        t->child[0] = exp();
+        t->type = Integer;
+        tt_insert(t->attr.name, t->type);
+    }
+    return t;
+
+}
+
+TreeNode* char_stmt()
+{
+    TreeNode* t = newStmtNode(CharK);
+    match(CHAR);
+    if (t != NULL && token == ID)
+    {
+        t->attr.name = copyString(tokenString);
+    }
+    match(ID);
+    match(ASSIGN);
+    if (t != NULL)
+    {
+        t->child[0] = exp();
+        t->type = Char;
+        tt_insert(t->attr.name, t->type);
+    }
     return t;
 }
 
@@ -234,7 +196,13 @@ TreeNode* write_stmt(void)
     if (t != NULL) t->child[0] = exp();
     return t;
 }
-
+TreeNode* writec_stmt()
+{
+    TreeNode* t = newStmtNode(WritecK);
+    match(WRITEC);
+    if (t != NULL) t->child[0] = exp();
+    return t;
+}
 TreeNode* exp(void)
 {
     TreeNode* t = simple_exp();
@@ -311,6 +279,17 @@ TreeNode* factor(void)
         t = exp();
         match(RPAREN);
         break;
+    case QUOT:
+        match(QUOT);
+        t = newExpNode(ConstK);
+        if (t != NULL && token == ID)
+        {
+            t->attr.val = (int)copyString(tokenString)[0];
+            t->type = Char;
+        }
+        match(ID);
+        match(QUOT);
+        break;
     default:
         syntaxError("unexpected token -> ");
         printToken(token, tokenString);
@@ -330,7 +309,7 @@ TreeNode* parse(void)
 {
     TreeNode* t;
     token = getToken();
-    t = program();
+    t = stmt_sequence();
     if (token != ENDFILE)
         syntaxError("Code ends before file\n");
     return t;

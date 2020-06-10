@@ -9,6 +9,7 @@
 
 #ifndef _SYMTAB_H_
 #define _SYMTAB_H_
+#include "GLOBALS.h"
 
 /* Procedure st_insert inserts line numbers and
  * memory locations into the symbol table
@@ -27,5 +28,11 @@ int st_lookup(char* name);
  * to the listing file
  */
 void printSymTab(FILE* listing);
+
+/* Procedure tt_insert
+*/
+void tt_insert(char* name, ExpType type);
+
+ExpType tt_lookup(char* name);
 
 #endif

@@ -39,6 +39,7 @@ typedef enum {
     opHALT,    /* RR     halt, operands are ignored */
     opIN,      /* RR     read into reg(r); s and t are ignored */
     opOUT,     /* RR     write from reg(r), s and t are ignored */
+    opOUC,     /* RR    write char from reg(r), s and t are ignored*/      
     opADD,    /* RR     reg(r) = reg(s)+reg(t) */
     opSUB,    /* RR     reg(r) = reg(s)-reg(t) */
     opMUL,    /* RR     reg(r) = reg(s)*reg(t) */
@@ -88,7 +89,7 @@ int dMem[DADDR_SIZE];
 int reg[NO_REGS];
 
 const char* opCodeTab[]
-= { "HALT","IN","OUT","ADD","SUB","MUL","DIV","????",
+= { "HALT","IN","OUT","OUC","ADD","SUB","MUL","DIV","????",
 /* RR opcodes */
 "LD","ST","????", /* RM opcodes */
 "LDA","LDC","JLT","JLE","JGT","JGE","JEQ","JNE","????"
@@ -395,6 +396,8 @@ STEPRESULT stepTM(void)
     case opOUT:
         printf("OUT instruction prints: %d\n", reg[r]);
         break;
+    case opOUC:
+        printf("OUC instruction prints : %c\n", (char)reg[r]);
     case opADD:  reg[r] = reg[s] + reg[t];  break;
     case opSUB:  reg[r] = reg[s] - reg[t];  break;
     case opMUL:  reg[r] = reg[s] * reg[t];  break;
