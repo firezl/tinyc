@@ -79,22 +79,22 @@ static void genStmt(TreeNode* tree)
         if (TraceCode)  emitComment("<- assign");
         break; /* assign_k */
     case IntK:
-        if (TraceCode) emitComment("-> assign");
+        if (TraceCode) emitComment("-> int");
         /* generate code for rhs */
         cGen(tree->child[0]);
         /* now store value */
         loc = st_lookup(tree->attr.name);
-        emitRM("ST", ac, loc, gp, "assign: store value");
-        if (TraceCode)  emitComment("<- assign");
+        emitRM("ST", ac, loc, gp, "int: store value");
+        if (TraceCode)  emitComment("<- int");
         break; /* assign_k */
     case CharK:
-        if (TraceCode) emitComment("-> assign");
+        if (TraceCode) emitComment("-> char");
         /* generate code for rhs */
         cGen(tree->child[0]);
         /* now store value */
         loc = st_lookup(tree->attr.name);
-        emitRM("ST", ac, loc, gp, "assign: store value");
-        if (TraceCode)  emitComment("<- assign");
+        emitRM("ST", ac, loc, gp, "char: store value");
+        if (TraceCode)  emitComment("<- char");
         break; /* assign_k */
     case ReadK:
         emitRO("IN", ac, 0, 0, "read integer value");

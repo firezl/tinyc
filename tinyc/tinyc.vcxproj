@@ -159,6 +159,7 @@
     <ClCompile Include="UTIL.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".tm" />
     <None Include="SAMPLE.TNY" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

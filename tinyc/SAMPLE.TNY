@@ -1,9 +1,9 @@
-char a := 'a';
-char b := 'b';
-int i := 5;
-if i < 6 then
-writec a
-else if i < 10 then
-writec b
-end 
+char c := 'a';
+int i := 0;
+while i < 6 do
+writec c;
+c := c + 1;
+i := i + 1
 end
+
+
